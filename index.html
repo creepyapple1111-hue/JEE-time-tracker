@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<title>JEE Time Tracker</title>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <div class="eyebrow">JEE MAIN + ADVANCED</div>
+  <h1>Time Tracker</h1>
+  <p id="todayLabel" class="muted"></p>
+</header>
+<nav class="tabs" aria-label="Sections">
+  <button class="tab active" data-tab="timer">Timer</button>
+  <button class="tab" data-tab="log">Daily log</button>
+  <button class="tab" data-tab="week">Weekly stats</button>
+  <button class="tab" data-tab="schedule">Timetable</button>
+</nav>
+
+<main>
+<section id="timer" class="panel active">
+  <div class="card timer-card">
+    <div class="row between">
+      <span class="pill" id="timerStatus">READY</span>
+      <span class="muted small" id="plannedRange">No block selected</span>
+    </div>
+    <div class="clock" id="clock">00:00:00</div>
+    <div class="muted center" id="timerSubject">Choose a subject and task</div>
+    <div class="fields">
+      <label>Subject
+        <select id="subject">
+          <option>Physics</option><option>Mathematics</option><option>Chemistry</option>
+          <option>Revision</option><option>Mock test</option><option>Test analysis</option><option>Other</option>
+        </select>
+      </label>
+      <label>Task / topic
+        <input id="task" maxlength="120" placeholder="e.g. Rotational motion: torque">
+      </label>
+      <label>Planned duration (minutes)
+        <input id="plannedMinutes" type="number" min="1" max="600" value="75">
+      </label>
+    </div>
+    <div class="button-row">
+      <button id="startBtn" class="primary">Start study</button>
+      <button id="pauseBtn" disabled>Pause</button>
+      <button id="finishBtn" disabled>Finish & log</button>
+    </div>
+    <p class="hint">Only running time counts as focused time. Paused time and interruptions are excluded. Keep the timer running only while actively studying.</p>
+  </div>
+  <div class="grid2">
+    <div class="stat"><span>Focused today</span><strong id="todayFocused">0 min</strong></div>
+    <div class="stat"><span>Planned today</span><strong id="todayPlanned">0 min</strong></div>
+  </div>
+  <div class="card">
+    <h2>Quick log</h2>
+    <p class="muted small">For study done without the timer, add actual focused minutes here.</p>
+    <div class="fields">
+      <label>Subject<select id="quickSubject"><option>Physics</option><option>Mathematics</option><option>Chemistry</option><option>Revision</option><option>Mock test</option><option>Test analysis</option><option>Other</option></select></label>
+      <label>Task<input id="quickTask" maxlength="120" placeholder="Topic / task"></label>
+      <label>Focused minutes<input id="quickMinutes" type="number" min="1" max="600" value="25"></label>
+      <label>Questions attempted<input id="quickAttempted" type="number" min="0" max="500" value="0"></label>
+      <label>Correct answers<input id="quickCorrect" type="number" min="0" max="500" value="0"></label>
+    </div>
+    <button id="quickAddBtn">Add to daily log</button>
+  </div>
+</section>
+
+<section id="log" class="panel">
+  <div class="card">
+    <div class="row between">
+      <h2>Daily log</h2>
+      <input id="logDate" type="date" aria-label="Choose date">
+    </div>
+    <div class="grid2">
+      <div class="stat"><span>Focused time</span><strong id="logFocused">0 min</strong></div>
+      <div class="stat"><span>Interruptions</span><strong id="logInterruptions">0 min</strong></div>
+    </div>
+    <div class="fields">
+      <label>Interruptions (minutes)<input id="interruptions" type="number" min="0" max="1440" value="0"></label>
+      <label>Daily notes<textarea id="dailyNotes" rows="2" placeholder="What went wrong? What is tomorrow's first task?"></textarea></label>
+    </div>
+    <button id="saveDayBtn" class="primary">Save daily notes</button>
+  </div>
+  <div id="entriesList" class="entry-list"></div>
+</section>
+
+<section id="week" class="panel">
+  <div class="card">
+    <h2>Weekly statistics</h2>
+    <p class="muted small" id="weekRange"></p>
+    <div class="grid2">
+      <div class="stat"><span>Focused time</span><strong id="weekFocused">0 h</strong></div>
+      <div class="stat"><span>Sessions</span><strong id="weekSessions">0</strong></div>
+      <div class="stat"><span>Questions attempted</span><strong id="weekAttempted">0</strong></div>
+      <div class="stat"><span>Accuracy</span><strong id="weekAccuracy">—</strong></div>
+      <div class="stat"><span>Study streak</span><strong id="streak">0 days</strong></div>
+      <div class="stat"><span>Missed timetable blocks</span><strong id="missedCount">0</strong></div>
+    </div>
+    <h3>Subject breakdown</h3>
+    <div id="subjectStats"></div>
+    <h3>Daily focused minutes</h3>
+    <div id="weekBars" class="bars"></div>
+  </div>
+  <div class="card">
+    <h2>Data controls</h2>
+    <p class="muted small">Your data stays in this browser on this device. Clearing browser site data can erase it. Export backups regularly.</p>
+    <div class="button-row">
+      <button id="exportBtn">Export backup (JSON)</button>
+      <label class="file-button">Import backup<input id="importFile" type="file" accept="application/json"></label>
+    </div>
+    <button id="clearBtn" class="danger">Delete all tracker data</button>
+  </div>
+</section>
+
+<section id="schedule" class="panel">
+  <div class="card">
+    <h2>Strict timetable & alarms</h2>
+    <p class="muted small">Default plan matches your 5:45 AM wake-up and 7 AM–3 PM coaching. Adjust it to your real commute and coaching breaks. Browser alarms work only when this app/browser is allowed to run; Android may delay them in the background. For reliable alarms, keep system alarms as a backup.</p>
+    <div class="row between">
+      <label class="toggle-label"><input id="alarmsEnabled" type="checkbox"> Enable timetable alarms</label>
+      <button id="notifyBtn">Allow notifications</button>
+    </div>
+    <div class="fields">
+      <label>Alarm lead time<select id="alarmLead"><option value="0">At start time</option><option value="2">2 min before</option><option value="5">5 min before</option></select></label>
+      <label>Day type<select id="scheduleDay"><option value="weekday">Mon–Sat</option><option value="sunday">Sunday</option></select></label>
+    </div>
+    <div id="scheduleList" class="schedule-list"></div>
+    <div class="button-row">
+      <button id="addBlockBtn">Add timetable block</button>
+      <button id="resetScheduleBtn">Reset default timetable</button>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Missed-block tracking</h2>
+    <p class="muted small">A block is marked missed when its start time passes and no matching block is marked done. You can mark a block done or skipped. This checks while the app is open; background checks can be delayed by Android.</p>
+    <div id="missedList" class="entry-list"></div>
+  </div>
+</section>
+</main>
+<footer><span>Built for consistent execution, not guilt.</span><button id="installBtn" hidden>Install app</button></footer>
+<div id="toast" role="status" aria-live="polite"></div>
+<script src="app.js"></script>
+</body>
+</html>
